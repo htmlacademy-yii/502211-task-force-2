@@ -1,7 +1,7 @@
 # Личный проект «TaskForce»
 
 * Студент: [Полина Титова](https://up.htmlacademy.ru/yii/2/user/502211).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Парфенов](https://htmlacademy.ru/profile/id926645).
 
 ---
 
