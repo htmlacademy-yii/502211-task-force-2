@@ -25,4 +25,25 @@ class Task
         $this->executorId = $executor;
         $this->currentId = $current;
     }
+
+    public function getStatusMap()
+    {
+        return [
+            self::STATUS_NEW => 'Новое',
+            self::STATUS_CANCELED => 'Отменено',
+            self::STATUS_IN_WORK => 'В работе',
+            self::STATUS_DONE => 'Выполнено',
+            self::STATUS_FAILED => 'Провалено',
+        ];
+    }
+
+    public function getActionMap()
+    {
+        return [
+            self::ACTION_CANCEL => 'Отменить',
+            self::ACTION_RESPOND => 'Откликнуться',
+            self::ACTION_DONE => 'Выполнено',
+            self::ACTION_REFUSE => 'Отказаться',
+        ];
+    }
 }
