@@ -12,4 +12,17 @@ class Task
     const ACTION_RESPOND = 'respond';
     const ACTION_DONE = 'done';
     const ACTION_REFUSE = 'refuse';
+
+    private $status;
+    private $currentId;
+    private $customerId;
+    private $executorId;
+
+    public function __construct($status, $customer = null, $executor, $current)
+    {
+        $this->status = $status;
+        $this->customerId = $customer;
+        $this->executorId = $executor;
+        $this->currentId = $current;
+    }
 }
