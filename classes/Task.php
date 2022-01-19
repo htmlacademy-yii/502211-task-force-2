@@ -58,4 +58,23 @@ class Task
 
         return $statusByActionArray[$action] ?? null;
     }
+
+    public function getNextActionByStatus($status)
+    {
+        $actionByStatusArray = [
+            self::STATUS_NEW => [
+                self::ACTION_CANCEL,
+                self::ACTION_RESPOND,
+            ],
+            self::STATUS_CANCELED => null,
+            self::STATUS_IN_WORK => [
+                self::ACTION_DONE,
+                self::ACTION_REFUSE,
+            ],
+            self::STATUS_DONE => null,
+            self::STATUS_FAILED => null,
+        ];
+
+        return $actionByStatusArray[$status] ?? null;
+    }
 }
