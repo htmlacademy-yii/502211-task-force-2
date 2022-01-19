@@ -46,4 +46,16 @@ class Task
             self::ACTION_REFUSE => 'Отказаться',
         ];
     }
+
+    public function getNextStatusByAction($action)
+    {
+        $statusByActionArray = [
+            self::ACTION_CANCEL => self::STATUS_CANCELED,
+            self::ACTION_RESPOND => self::STATUS_IN_WORK,
+            self::ACTION_DONE => self::STATUS_DONE,
+            self::ACTION_REFUSE => self::STATUS_FAILED,
+        ];
+
+        return $statusByActionArray[$action] ?? null;
+    }
 }
