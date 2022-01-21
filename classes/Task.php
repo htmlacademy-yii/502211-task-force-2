@@ -12,18 +12,17 @@ class Task
     const ACTION_RESPOND = 'respond';
     const ACTION_DONE = 'done';
     const ACTION_REFUSE = 'refuse';
+    const ACTION_CHOOSE_EXECUTOR = 'choose executor';
 
     private $status;
-    private $currentId;
     private $customerId;
     private $executorId;
 
-    public function __construct($status, $customer = null, $executor, $current)
+    public function __construct($status, $customer, $executor = null)
     {
         $this->status = $status;
         $this->customerId = $customer;
         $this->executorId = $executor;
-        $this->currentId = $current;
     }
 
     public function getStatusMap()
@@ -42,39 +41,46 @@ class Task
         return [
             self::ACTION_CANCEL => 'Отменить',
             self::ACTION_RESPOND => 'Откликнуться',
+            self::ACTION_CHOOSE_EXECUTOR => 'Выбрать исполнителя',
             self::ACTION_DONE => 'Выполнено',
             self::ACTION_REFUSE => 'Отказаться',
         ];
     }
 
-    public function getNextStatusByAction($action)
+    public function getAvailableStatuses($action)
     {
-        $statusByActionArray = [
+        $availableStatusesArray = [
             self::ACTION_CANCEL => self::STATUS_CANCELED,
-            self::ACTION_RESPOND => self::STATUS_IN_WORK,
+            self::ACTION_RESPOND => self::ACTION_CHOOSE_EXECUTOR,
+            self::ACTION_CHOOSE_EXECUTOR => self::STATUS_IN_WORK,
             self::ACTION_DONE => self::STATUS_DONE,
             self::ACTION_REFUSE => self::STATUS_FAILED,
         ];
 
-        return $statusByActionArray[$action] ?? null;
+        return $availableStatusesArray[$action] ?? null;
     }
 
-    public function getNextActionByStatus($status)
+    public function getAvailableActions($status, $currentId, $customerId, $executorId)
     {
-        $actionByStatusArray = [
+        $availableCustomerActionsArray = [
             self::STATUS_NEW => [
                 self::ACTION_CANCEL,
-                self::ACTION_RESPOND,
+                self::ACTION_CHOOSE_EXECUTOR,
             ],
             self::STATUS_CANCELED => null,
-            self::STATUS_IN_WORK => [
-                self::ACTION_DONE,
-                self::ACTION_REFUSE,
-            ],
+            self::STATUS_IN_WORK => self::ACTION_DONE,
             self::STATUS_DONE => null,
             self::STATUS_FAILED => null,
         ];
 
-        return $actionByStatusArray[$status] ?? null;
+        $availableExecutorActionsArray = [
+            self::STATUS_NEW => self::ACTION_RESPOND,
+            self::STATUS_CANCELED => null,
+            self::STATUS_IN_WORK => self::ACTION_REFUSE,
+            self::STATUS_DONE => null,
+            self::STATUS_FAILED => null,
+        ];
+
+        return $currentId === $customerId ? $availableCustomerActionsArray[$status] : $availableExecutorActionsArray[$status];
     }
 }
