@@ -57,30 +57,34 @@ class Task
             self::ACTION_REFUSE => self::STATUS_FAILED,
         ];
 
-        return $availableStatusesArray[$action] ?? null;
+        return $availableStatusesArray[$action] ?? [];
     }
 
-    public function getAvailableActions($status, $currentId, $customerId, $executorId)
+    public function getAvailableActions()
     {
         $availableCustomerActionsArray = [
             self::STATUS_NEW => [
                 self::ACTION_CANCEL,
                 self::ACTION_CHOOSE_EXECUTOR,
             ],
-            self::STATUS_CANCELED => null,
+            self::STATUS_CANCELED => [],
             self::STATUS_IN_WORK => self::ACTION_DONE,
-            self::STATUS_DONE => null,
-            self::STATUS_FAILED => null,
+            self::STATUS_DONE => [],
+            self::STATUS_FAILED => [],
         ];
 
         $availableExecutorActionsArray = [
             self::STATUS_NEW => self::ACTION_RESPOND,
-            self::STATUS_CANCELED => null,
+            self::STATUS_CANCELED => [],
             self::STATUS_IN_WORK => self::ACTION_REFUSE,
-            self::STATUS_DONE => null,
-            self::STATUS_FAILED => null,
+            self::STATUS_DONE => [],
+            self::STATUS_FAILED => [],
         ];
 
-        return $currentId === $customerId ? $availableCustomerActionsArray[$status] : $availableExecutorActionsArray[$status];
+        return $this->currentId === $this->customerId
+         ? $availableCustomerActionsArray[$this->status]
+         : $this->currentId === $this->executorId
+            ? $availableExecutorActionsArray[$this->status]
+            : [];
     }
 }
