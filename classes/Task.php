@@ -12,20 +12,20 @@ class Task
     const ACTION_RESPOND = 'respond';
     const ACTION_DONE = 'done';
     const ACTION_REFUSE = 'refuse';
-    const ACTION_CHOOSE_EXECUTOR = 'choose executor';
+    const ACTION_START = 'start';
 
     private $status;
     private $customerId;
     private $executorId;
 
-    public function __construct($status, $customer, $executor = null)
+    public function __construct(string $status, int $customerId, ?int $executorId = null)
     {
         $this->status = $status;
-        $this->customerId = $customer;
-        $this->executorId = $executor;
+        $this->customerId = $customerId;
+        $this->executorId = $executorId;
     }
 
-    public function getStatusMap()
+    public function getStatusMap(): array
     {
         return [
             self::STATUS_NEW => 'Новое',
@@ -36,55 +36,73 @@ class Task
         ];
     }
 
-    public function getActionMap()
+    public function getActionMap(): array
     {
         return [
             self::ACTION_CANCEL => 'Отменить',
             self::ACTION_RESPOND => 'Откликнуться',
-            self::ACTION_CHOOSE_EXECUTOR => 'Выбрать исполнителя',
+            self::ACTION_START => 'Запуск',
             self::ACTION_DONE => 'Выполнено',
             self::ACTION_REFUSE => 'Отказаться',
         ];
     }
 
-    public function getAvailableStatuses($action)
+    public function getStatusAfterAction(string $action): ?string
     {
         $availableStatusesArray = [
             self::ACTION_CANCEL => self::STATUS_CANCELED,
-            self::ACTION_RESPOND => self::ACTION_CHOOSE_EXECUTOR,
-            self::ACTION_CHOOSE_EXECUTOR => self::STATUS_IN_WORK,
+            self::ACTION_RESPOND => self::ACTION_START,
+            self::ACTION_START => self::STATUS_IN_WORK,
             self::ACTION_DONE => self::STATUS_DONE,
             self::ACTION_REFUSE => self::STATUS_FAILED,
         ];
 
-        return $availableStatusesArray[$action] ?? [];
+        return $availableStatusesArray[$action] ?? null;
     }
 
-    public function getAvailableActions()
+    public function getAvailableActions(int $currentId, ?int $executorId): array
     {
         $availableCustomerActionsArray = [
             self::STATUS_NEW => [
                 self::ACTION_CANCEL,
-                self::ACTION_CHOOSE_EXECUTOR,
+                self::ACTION_START,
             ],
             self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => self::ACTION_DONE,
+            self::STATUS_IN_WORK => [self::ACTION_DONE],
             self::STATUS_DONE => [],
             self::STATUS_FAILED => [],
         ];
 
         $availableExecutorActionsArray = [
-            self::STATUS_NEW => self::ACTION_RESPOND,
+            self::STATUS_NEW => [],
             self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => self::ACTION_REFUSE,
+            self::STATUS_IN_WORK => [self::ACTION_REFUSE],
             self::STATUS_DONE => [],
             self::STATUS_FAILED => [],
         ];
 
-        return $this->currentId === $this->customerId
-         ? $availableCustomerActionsArray[$this->status]
-         : $this->currentId === $this->executorId
-            ? $availableExecutorActionsArray[$this->status]
-            : [];
+        $availableRandomUserActionsArray = [
+            self::STATUS_NEW => [self::ACTION_RESPOND],
+            self::STATUS_CANCELED => [],
+            self::STATUS_IN_WORK => [],
+            self::STATUS_DONE => [],
+            self::STATUS_FAILED => [],
+        ];
+
+        $this->executorId = $executorId;
+
+        if ($currentId === $this->customerId) {
+            return $availableCustomerActionsArray[$this->status];
+        }
+
+        if ($currentId === $this->executorId) {
+            return $availableExecutorActionsArray[$this->status];
+        }
+
+        if ($currentId !== $this->customerId && $currentId !== $this->executorId) {
+            return $availableRandomUserActionsArray[$this->status];
+        }
+
+        return [];
     }
 }
