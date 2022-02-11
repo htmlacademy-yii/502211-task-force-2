@@ -35,19 +35,19 @@ class TaskTest extends TestCase
         $randomUserId = 3;
 
         $task = new Task(Task::STATUS_NEW, $customerId);
-        $actions = $task->getAvailableActions($customerId, null);
+        $actions = $task->getAvailableActions($customerId);
         $this->assertEquals([Task::ACTION_CANCEL, Task::ACTION_START], $actions);
 
         $task = new Task(Task::STATUS_NEW, $customerId);
-        $actions = $task->getAvailableActions($randomUserId, null);
+        $actions = $task->getAvailableActions($randomUserId);
         $this->assertEquals([Task::ACTION_RESPOND], $actions);
 
         $task = new Task(Task::STATUS_IN_WORK, $customerId);
-        $actions = $task->getAvailableActions($customerId, $executorId);
+        $actions = $task->getAvailableActions($customerId);
         $this->assertEquals([Task::ACTION_DONE], $actions);
 
-        $task = new Task(Task::STATUS_IN_WORK, $customerId);
-        $actions = $task->getAvailableActions($executorId, $executorId);
+        $task = new Task(Task::STATUS_IN_WORK, $customerId, $executorId);
+        $actions = $task->getAvailableActions($executorId);
         $this->assertEquals([Task::ACTION_REFUSE], $actions);
     }
 }

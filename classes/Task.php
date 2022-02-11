@@ -60,7 +60,7 @@ class Task
         return $availableStatusesArray[$action] ?? null;
     }
 
-    public function getAvailableActions(int $currentId, ?int $executorId): array
+    public function getAvailableActions(int $currentId): array
     {
         $availableCustomerActionsArray = [
             self::STATUS_NEW => [
@@ -88,8 +88,6 @@ class Task
             self::STATUS_DONE => [],
             self::STATUS_FAILED => [],
         ];
-
-        $this->executorId = $executorId;
 
         if ($currentId === $this->customerId) {
             return $availableCustomerActionsArray[$this->status];
