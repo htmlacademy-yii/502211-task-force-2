@@ -5,8 +5,6 @@ namespace Tests\Unit;
 use PHPUnit\Framework\TestCase;
 use TaskForce\Classes\Task;
 
-require __DIR__ . '/../../src/classes/Task.php';
-
 class TaskTest extends TestCase
 {
     public function testGetStatusAfterAction()
