@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
-use TaskForce\Task;
+use TaskForce\Classes\Task;
 
 require __DIR__ . '/../../src/classes/Task.php';
 
