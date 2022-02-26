@@ -37,6 +37,14 @@ CREATE TABLE IF NOT EXISTS `task_force`.`users` (
     PRIMARY KEY (`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `task_force`.`users_categories` (
+    `user_id` INT UNSIGNED NOT NULL,
+    `category_id` INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `task_force`.`tasks` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `executor_id` INT UNSIGNED NOT NULL,
@@ -52,6 +60,10 @@ CREATE TABLE IF NOT EXISTS `task_force`.`tasks` (
     `lat` VARCHAR(15) DEFAULT NULL,
     `long` VARCHAR(15) DEFAULT NULL,
     `opinions` INT DEFAULT NULL,
+
+    FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -61,6 +73,9 @@ CREATE TABLE IF NOT EXISTS `task_force`.`replies` (
     `description` VARCHAR(255) DEFAULT NULL,
     `task_id` INT UNSIGNED NOT NULL,
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -71,6 +86,9 @@ CREATE TABLE IF NOT EXISTS `task_force`.`opinions` (
     `description` VARCHAR(255) DEFAULT NULL,
     `task_id` INT UNSIGNED NOT NULL,
     `user_id` INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -80,5 +98,8 @@ CREATE TABLE IF NOT EXISTS `task_force`.`reviews` (
     `customer_id` INT UNSIGNED NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `rate` INT NOT NULL,
-    PRIMARY KEY (`id`)
+
+    FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`),
+    PRIMARY KEY (`id`, `executor_id`, `customer_id`)
 );
