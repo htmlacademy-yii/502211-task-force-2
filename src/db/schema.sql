@@ -4,22 +4,21 @@ CREATE SCHEMA IF NOT EXISTS `task_force` DEFAULT CHARACTER SET utf8 DEFAULT COLL
 
 USE `task_force`;
 
-CREATE TABLE IF NOT EXISTS `task_force`.`cities` (
+CREATE TABLE IF NOT EXISTS `cities` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `city` VARCHAR(45) NULL,
-    `lat` VARCHAR(15) NULL,
-    `long` VARCHAR(15) NULL,
+    `name` VARCHAR(45) NULL,
+    `coordinates` geography::Point(VARCHAR(15) NULL, VARCHAR(15), 4326),
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `task_force`.`categories` (
+CREATE TABLE IF NOT EXISTS `categories` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(45) NULL,
     `icon` VARCHAR(45) NOT NULL,
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `task_force`.`users` (
+CREATE TABLE IF NOT EXISTS `users` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(45) NOT NULL,
     `email` VARCHAR(45) NOT NULL,
@@ -27,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `task_force`.`users` (
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `last_visit` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
-    `bd` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `birthday` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `address` VARCHAR(255) DEFAULT NULL,
     `phone` VARCHAR(15) DEFAULT NULL,
     `skype` VARCHAR(50) DEFAULT NULL,
@@ -37,28 +36,29 @@ CREATE TABLE IF NOT EXISTS `task_force`.`users` (
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `task_force`.`users_categories` (
+CREATE TABLE IF NOT EXISTS `users_categories` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` INT UNSIGNED NOT NULL,
     `category_id` INT UNSIGNED NOT NULL,
 
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
+    PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `task_force`.`tasks` (
+CREATE TABLE IF NOT EXISTS `tasks` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `executor_id` INT UNSIGNED NOT NULL,
     `customer_id` INT UNSIGNED NOT NULL,
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `category_id` INT UNSIGNED NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
-    `status` VARCHAR(15) DEFAULT 'new' NULL,
-    `expire` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `status` TINYINT DEFAULT 1,
+    `expire` TIMESTAMP NOT NULL,
     `name` VARCHAR(45) NOT NULL,
     `address` VARCHAR(255) DEFAULT NULL,
-    `budget` INT NOT NULL,
-    `lat` VARCHAR(15) DEFAULT NULL,
-    `long` VARCHAR(15) DEFAULT NULL,
+    `budget` INT DEFAULT NULL,
+    `coordinates` geography::Point(VARCHAR(15) NULL, VARCHAR(15), 4326),
     `opinions` INT DEFAULT NULL,
 
     FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `task_force`.`tasks` (
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `task_force`.`replies` (
+CREATE TABLE IF NOT EXISTS `replies` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `executor_id` INT UNSIGNED NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
@@ -79,20 +79,20 @@ CREATE TABLE IF NOT EXISTS `task_force`.`replies` (
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `task_force`.`opinions` (
+CREATE TABLE IF NOT EXISTS `opinions` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `rate` INT DEFAULT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `task_id` INT UNSIGNED NOT NULL,
-    `user_id` INT UNSIGNED NOT NULL,
+    `executor_id` INT UNSIGNED NOT NULL,
 
     FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `task_force`.`reviews` (
+CREATE TABLE IF NOT EXISTS `reviews` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `executor_id` INT UNSIGNED NOT NULL,
     `customer_id` INT UNSIGNED NOT NULL,
