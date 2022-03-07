@@ -7,7 +7,8 @@ USE `task_force`;
 CREATE TABLE IF NOT EXISTS `cities` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(45) NULL,
-    `coordinates` geography::Point(VARCHAR(15) NULL, VARCHAR(15), 4326),
+    `lat` DECIMAL (11, 8),
+    `long` DECIMAL (11, 8),
     PRIMARY KEY (`id`)
 );
 
@@ -32,7 +33,9 @@ CREATE TABLE IF NOT EXISTS `users` (
     `skype` VARCHAR(50) DEFAULT NULL,
     `role` VARCHAR(15) DEFAULT 'executor' NOT NULL,
     `rate` INT DEFAULT NULL,
-    `favorite` INT DEFAULT 0,
+    `favorites` INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (`favorites`) REFERENCES `favorites` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -43,6 +46,14 @@ CREATE TABLE IF NOT EXISTS `users_categories` (
 
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `favorites` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -58,7 +69,8 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     `name` VARCHAR(45) NOT NULL,
     `address` VARCHAR(255) DEFAULT NULL,
     `budget` INT DEFAULT NULL,
-    `coordinates` geography::Point(VARCHAR(15) NULL, VARCHAR(15), 4326),
+    `lat` DECIMAL (11, 8),
+    `long` DECIMAL (11, 8),
     `opinions` INT DEFAULT NULL,
 
     FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
