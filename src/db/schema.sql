@@ -6,7 +6,7 @@ USE `task_force`;
 
 CREATE TABLE IF NOT EXISTS `cities` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(45) NULL,
+    `name` VARCHAR(45) NOT NULL,
     `lat` DECIMAL (11, 8),
     `long` DECIMAL (11, 8),
     PRIMARY KEY (`id`)
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `cities` (
 
 CREATE TABLE IF NOT EXISTS `categories` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(45) NULL,
+    `name` VARCHAR(45) NOT NULL,
     `icon` VARCHAR(45) NOT NULL,
     PRIMARY KEY (`id`)
 );
@@ -28,14 +28,13 @@ CREATE TABLE IF NOT EXISTS `users` (
     `last_visit` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `birthday` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    `address` VARCHAR(255) DEFAULT NULL,
+    `address` INT UNSIGNED NOT NULL,
     `phone` VARCHAR(15) DEFAULT NULL,
     `skype` VARCHAR(50) DEFAULT NULL,
-    `role` VARCHAR(15) DEFAULT 'executor' NOT NULL,
+    `role` TINYINT DEFAULT 1,
     `rate` INT DEFAULT NULL,
-    `favorites` INT UNSIGNED NOT NULL,
 
-    FOREIGN KEY (`favorites`) REFERENCES `favorites` (`id`),
+    FOREIGN KEY (`address`) REFERENCES `cities` (`id`)
     PRIMARY KEY (`id`)
 );
 
@@ -52,8 +51,10 @@ CREATE TABLE IF NOT EXISTS `users_categories` (
 CREATE TABLE IF NOT EXISTS `favorites` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` INT UNSIGNED NOT NULL,
+    `favorite_user_id` INT UNSIGNED NOT NULL,
 
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`favorite_user_id`) REFERENCES `users` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -71,7 +72,6 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     `budget` INT DEFAULT NULL,
     `lat` DECIMAL (11, 8),
     `long` DECIMAL (11, 8),
-    `opinions` INT DEFAULT NULL,
 
     FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
     FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`),
