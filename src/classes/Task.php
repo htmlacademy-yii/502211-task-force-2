@@ -1,7 +1,13 @@
 <?php
 
 namespace TaskForce\Classes;
-use TaskForce\Classes\Actions;
+
+use TaskForce\Classes\Actions\Action;
+use TaskForce\Classes\Actions\ActionCancel;
+use TaskForce\Classes\Actions\ActionRespond;
+use TaskForce\Classes\Actions\ActionStart;
+use TaskForce\Classes\Actions\ActionDone;
+use TaskForce\Classes\Actions\ActionRefuse;
 
 class Task
 {
@@ -63,47 +69,25 @@ class Task
         return $availableStatusesArray[$action] ?? null;
     }
 
-    public function getAvailableActions(int $currentId): array
+    public function getAvailableActions(string $status): array
     {
-        $availableCustomerActionsArray = [
+        $availableActionsArray = [
             self::STATUS_NEW => [
-                self::ACTION_CANCEL,
-                self::ACTION_START,
+                new ActionCancel(),
+                new ActionRespond(),
+                new ActionStart(),
             ],
             self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => [self::ACTION_DONE],
+            self::STATUS_IN_WORK => [
+                new ActionDone(),
+                new ActionRefuse(),
+            ],
             self::STATUS_DONE => [],
             self::STATUS_FAILED => [],
         ];
 
-        $availableExecutorActionsArray = [
-            self::STATUS_NEW => [],
-            self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => [self::ACTION_REFUSE],
-            self::STATUS_DONE => [],
-            self::STATUS_FAILED => [],
-        ];
-
-        $availableRandomUserActionsArray = [
-            self::STATUS_NEW => [self::ACTION_RESPOND],
-            self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => [],
-            self::STATUS_DONE => [],
-            self::STATUS_FAILED => [],
-        ];
-
-        if ($currentId === $this->customerId) {
-            return $availableCustomerActionsArray[$this->status];
-        }
-
-        if ($currentId === $this->executorId) {
-            return $availableExecutorActionsArray[$this->status];
-        }
-
-        if ($currentId !== $this->customerId && $currentId !== $this->executorId) {
-            return $availableRandomUserActionsArray[$this->status];
-        }
-
-        return [];
+        return array_filter($availableActionsArray[$status], function (Action $action) {
+            return $action->getRights($this->customerId, $this->executorId, $this->currentId);
+        });
     }
 }
