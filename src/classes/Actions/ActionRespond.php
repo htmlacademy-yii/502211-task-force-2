@@ -2,20 +2,21 @@
 
 namespace TaskForce\Classes\Actions;
 
-class ActionRespond extends Action
+use TaskForce\Classes\Task;
+
+class ActionRespond extends AbstractAction
 {
-    public function getTitle(): string
-    {
-        return 'Откликнуться';
-    }
+    protected string $title = 'Откликнуться';
+    protected string $name = 'respond';
 
-    public function getName(): string
+    public static function isAvailable(Task $task, int $currentUserId): bool
     {
-        return 'respond';
-    }
+        if ($task->status !== Task::STATUS_NEW) {
+            return false;
+        }
 
-    public function getRights(int $customerId, int $executorId, int $currentId): bool
-    {
-        return $currentId !== $this->customerId && $currentId !== $this->executorId;
+        if ($currentUserId !== $task->customerId && $currentUserId !== $task->executorId) {
+            return true;
+        }
     }
 }

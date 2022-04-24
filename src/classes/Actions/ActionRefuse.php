@@ -2,20 +2,19 @@
 
 namespace TaskForce\Classes\Actions;
 
-class ActionRefuse extends Action
+use TaskForce\Classes\Task;
+
+class ActionRefuse extends AbstractAction
 {
-    public function getTitle(): string
-    {
-        return 'Отказаться';
-    }
+    protected string $title = 'Отказаться';
+    protected string $name = 'refuse';
 
-    public function getName(): string
+    public static function isAvailable(Task $task, int $currentUserId): bool
     {
-        return 'refuse';
-    }
+        if ($task->status !== Task::STATUS_IN_WORK) {
+            return false;
+        }
 
-    public function getRights(int $customerId, int $executorId, int $currentId): bool
-    {
-        return $this->currentId === $this->executorId;
+        return $currentUserId === $task->executorId;
     }
 }

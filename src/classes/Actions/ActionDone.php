@@ -2,20 +2,19 @@
 
 namespace TaskForce\Classes\Actions;
 
-class ActionDone extends Action
+use TaskForce\Classes\Task;
+
+class ActionDone extends AbstractAction
 {
-    public function getTitle(): string
-    {
-        return 'Выполнено';
-    }
+    protected string $title = 'Выполнено';
+    protected string $name = 'done';
 
-    public function getName(): string
+    public static function isAvailable(Task $task, int $currentUserId): bool
     {
-        return 'done';
-    }
+        if ($task->status !== Task::STATUS_IN_WORK) {
+            return false;
+        }
 
-    public function getRights(int $customerId, int $executorId, int $currentId): bool
-    {
-        return $this->currentId === $this->customerId;
+        return $currentUserId === $task->customerId;
     }
 }

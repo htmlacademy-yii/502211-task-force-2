@@ -1,21 +1,19 @@
 <?php
 
 namespace TaskForce\Classes\Actions;
+use TaskForce\Classes\Task;
 
-class ActionCancel extends Action
+class ActionCancel extends AbstractAction
 {
-    public function getTitle(): string
-    {
-        return 'Отменить';
-    }
+    protected string $title = 'Отменить';
+    protected string $name = 'cancel';
 
-    public function getName(): string
+    public static function isAvailable(Task $task, int $currentUserId): bool
     {
-        return 'cancel';
-    }
+        if ($task->status !== Task::STATUS_NEW) {
+            return false;
+        }
 
-    public function getRights(int $customerId, int $executorId, int $currentId): bool
-    {
-        return $this->currentId === $this->customerId;
+        return $currentUserId === $task->customerId;
     }
 }

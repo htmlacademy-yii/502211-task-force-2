@@ -2,20 +2,19 @@
 
 namespace TaskForce\Classes\Actions;
 
-class ActionStart extends Action
+use TaskForce\Classes\Task;
+
+class ActionStart extends AbstractAction
 {
-    public function getTitle(): string
-    {
-        return 'Запуск';
-    }
+    protected string $title = 'Запуск';
+    protected string $name = 'start';
 
-    public function getName(): string
+    public static function isAvailable(Task $task, int $currentUserId): bool
     {
-        return 'start';
-    }
+        if ($task->status !== Task::STATUS_NEW) {
+            return false;
+        }
 
-    public function getRights(int $customerId, int $executorId, int $currentId): bool
-    {
-        return $this->currentId === $this->customerId;
+        return $currentUserId === $task->customerId;
     }
 }
