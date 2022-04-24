@@ -3,6 +3,11 @@
 namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use TaskForce\Classes\Actions\ActionCancel;
+use TaskForce\Classes\Actions\ActionDone;
+use TaskForce\Classes\Actions\ActionRefuse;
+use TaskForce\Classes\Actions\ActionRespond;
+use TaskForce\Classes\Actions\ActionStart;
 use TaskForce\Classes\Task;
 
 class TaskTest extends TestCase
@@ -17,7 +22,7 @@ class TaskTest extends TestCase
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $status = $task->getStatusAfterAction(Task::ACTION_RESPOND);
-        $this->assertEquals(Task::ACTION_START, $status);
+        $this->assertEquals(new ActionStart, $status);
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $status = $task->getStatusAfterAction(Task::ACTION_START);
@@ -40,11 +45,11 @@ class TaskTest extends TestCase
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $actions = $task->getAvailableActions($customerId);
-        $this->assertEquals([Task::ACTION_CANCEL, Task::ACTION_START], $actions);
+        $this->assertEquals([new ActionCancel], $actions);
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $actions = $task->getAvailableActions($randomUserId);
-        $this->assertEquals([Task::ACTION_RESPOND], $actions);
+        $this->assertEquals([new ActionRespond], $actions);
 
 
         $task = new Task(Task::STATUS_CANCELED, $customerId);
@@ -58,11 +63,11 @@ class TaskTest extends TestCase
 
         $task = new Task(Task::STATUS_IN_WORK, $customerId, $executorId);
         $actions = $task->getAvailableActions($customerId);
-        $this->assertEquals([Task::ACTION_DONE], $actions);
+        $this->assertEquals([new ActionDone], $actions);
 
         $task = new Task(Task::STATUS_IN_WORK, $customerId, $executorId);
         $actions = $task->getAvailableActions($executorId);
-        $this->assertEquals([Task::ACTION_REFUSE], $actions);
+        $this->assertEquals([new ActionRefuse], $actions);
 
         $task = new Task(Task::STATUS_IN_WORK, $customerId, $executorId);
         $actions = $task->getAvailableActions($randomUserId);

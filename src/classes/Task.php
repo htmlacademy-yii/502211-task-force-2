@@ -2,7 +2,6 @@
 
 namespace TaskForce\Classes;
 
-use TaskForce\Classes\Actions\Action;
 use TaskForce\Classes\Actions\ActionCancel;
 use TaskForce\Classes\Actions\ActionRespond;
 use TaskForce\Classes\Actions\ActionStart;
@@ -69,25 +68,30 @@ class Task
         return $availableStatusesArray[$action] ?? null;
     }
 
-    public function getAvailableActions(string $status): array
+    public function getAvailableActions(int $currentUserId): array
     {
-        $availableActionsArray = [
-            self::STATUS_NEW => [
-                new ActionCancel(),
-                new ActionRespond(),
-                new ActionStart(),
-            ],
-            self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => [
-                new ActionDone(),
-                new ActionRefuse(),
-            ],
-            self::STATUS_DONE => [],
-            self::STATUS_FAILED => [],
-        ];
+        $availableActions = [];
 
-        return array_filter($availableActionsArray[$status], function (Action $action) {
-            return $action->getRights($this->customerId, $this->executorId, $this->currentId);
-        });
+        if (ActionCancel::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionCancel();
+        }
+
+        if (ActionRespond::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionRespond();
+        }
+
+        if (ActionStart::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionStart();
+        }
+
+        if (ActionDone::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionDone();
+        }
+
+        if (ActionRefuse::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionRefuse();
+        }
+
+        return $availableActions;
     }
 }
