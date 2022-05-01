@@ -22,9 +22,9 @@ class Task
     const ACTION_REFUSE = 'refuse';
     const ACTION_START = 'start';
 
-    private $status;
-    private $customerId;
-    private $executorId;
+    public $status;
+    public $customerId;
+    public $executorId;
 
     public function __construct(string $status, int $customerId, ?int $executorId = null)
     {
@@ -59,7 +59,7 @@ class Task
     {
         $availableStatusesArray = [
             self::ACTION_CANCEL => self::STATUS_CANCELED,
-            self::ACTION_RESPOND => self::ACTION_START,
+            self::ACTION_RESPOND => self::STATUS_NEW,
             self::ACTION_START => self::STATUS_IN_WORK,
             self::ACTION_DONE => self::STATUS_DONE,
             self::ACTION_REFUSE => self::STATUS_FAILED,

@@ -22,7 +22,7 @@ class TaskTest extends TestCase
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $status = $task->getStatusAfterAction(Task::ACTION_RESPOND);
-        $this->assertEquals(new ActionStart, $status);
+        $this->assertEquals(Task::STATUS_NEW, $status);
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $status = $task->getStatusAfterAction(Task::ACTION_START);
@@ -45,7 +45,7 @@ class TaskTest extends TestCase
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $actions = $task->getAvailableActions($customerId);
-        $this->assertEquals([new ActionCancel], $actions);
+        $this->assertEquals([new ActionCancel, new ActionStart], $actions);
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $actions = $task->getAvailableActions($randomUserId);

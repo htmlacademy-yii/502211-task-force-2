@@ -15,8 +15,6 @@ class ActionRespond extends AbstractAction
             return false;
         }
 
-        if ($currentUserId !== $task->customerId && $currentUserId !== $task->executorId) {
-            return true;
-        }
+        return $currentUserId !== $task->customerId && $currentUserId !== $task->executorId;
     }
 }
