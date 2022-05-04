@@ -2,6 +2,12 @@
 
 namespace TaskForce\Classes;
 
+use TaskForce\Classes\Actions\ActionCancel;
+use TaskForce\Classes\Actions\ActionRespond;
+use TaskForce\Classes\Actions\ActionStart;
+use TaskForce\Classes\Actions\ActionDone;
+use TaskForce\Classes\Actions\ActionRefuse;
+
 class Task
 {
     const STATUS_NEW = 'new';
@@ -16,9 +22,9 @@ class Task
     const ACTION_REFUSE = 'refuse';
     const ACTION_START = 'start';
 
-    private $status;
-    private $customerId;
-    private $executorId;
+    public $status;
+    public $customerId;
+    public $executorId;
 
     public function __construct(string $status, int $customerId, ?int $executorId = null)
     {
@@ -53,7 +59,7 @@ class Task
     {
         $availableStatusesArray = [
             self::ACTION_CANCEL => self::STATUS_CANCELED,
-            self::ACTION_RESPOND => self::ACTION_START,
+            self::ACTION_RESPOND => self::STATUS_NEW,
             self::ACTION_START => self::STATUS_IN_WORK,
             self::ACTION_DONE => self::STATUS_DONE,
             self::ACTION_REFUSE => self::STATUS_FAILED,
@@ -62,47 +68,30 @@ class Task
         return $availableStatusesArray[$action] ?? null;
     }
 
-    public function getAvailableActions(int $currentId): array
+    public function getAvailableActions(int $currentUserId): array
     {
-        $availableCustomerActionsArray = [
-            self::STATUS_NEW => [
-                self::ACTION_CANCEL,
-                self::ACTION_START,
-            ],
-            self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => [self::ACTION_DONE],
-            self::STATUS_DONE => [],
-            self::STATUS_FAILED => [],
-        ];
+        $availableActions = [];
 
-        $availableExecutorActionsArray = [
-            self::STATUS_NEW => [],
-            self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => [self::ACTION_REFUSE],
-            self::STATUS_DONE => [],
-            self::STATUS_FAILED => [],
-        ];
-
-        $availableRandomUserActionsArray = [
-            self::STATUS_NEW => [self::ACTION_RESPOND],
-            self::STATUS_CANCELED => [],
-            self::STATUS_IN_WORK => [],
-            self::STATUS_DONE => [],
-            self::STATUS_FAILED => [],
-        ];
-
-        if ($currentId === $this->customerId) {
-            return $availableCustomerActionsArray[$this->status];
+        if (ActionCancel::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionCancel();
         }
 
-        if ($currentId === $this->executorId) {
-            return $availableExecutorActionsArray[$this->status];
+        if (ActionRespond::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionRespond();
         }
 
-        if ($currentId !== $this->customerId && $currentId !== $this->executorId) {
-            return $availableRandomUserActionsArray[$this->status];
+        if (ActionStart::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionStart();
         }
 
-        return [];
+        if (ActionDone::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionDone();
+        }
+
+        if (ActionRefuse::isAvailable($this, $currentUserId)) {
+            $availableActions[] = new ActionRefuse();
+        }
+
+        return $availableActions;
     }
 }
