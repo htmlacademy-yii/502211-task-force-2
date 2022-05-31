@@ -2,6 +2,7 @@
 
 namespace TaskForce\Classes;
 
+use Exceptions\Exception;
 use TaskForce\Classes\Actions\ActionCancel;
 use TaskForce\Classes\Actions\ActionRespond;
 use TaskForce\Classes\Actions\ActionStart;
@@ -65,7 +66,11 @@ class Task
             self::ACTION_REFUSE => self::STATUS_FAILED,
         ];
 
-        return $availableStatusesArray[$action] ?? null;
+        if (!isset($availableStatusesArray[$action])) {
+            throw new Exception("Action не может иметь такое значение");
+        }
+
+        return $availableStatusesArray[$action];
     }
 
     public function getAvailableActions(int $currentUserId): array

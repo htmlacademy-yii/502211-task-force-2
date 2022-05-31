@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Exceptions\Exception;
 use PHPUnit\Framework\TestCase;
 use TaskForce\Classes\Actions\ActionCancel;
 use TaskForce\Classes\Actions\ActionDone;
@@ -35,6 +36,10 @@ class TaskTest extends TestCase
         $task = new Task(Task::STATUS_IN_WORK, $customerId);
         $status = $task->getStatusAfterAction(Task::ACTION_REFUSE);
         $this->assertEquals(Task::STATUS_FAILED, $status);
+
+        $task = new Task(Task::STATUS_NEW, $customerId);
+        $status = $task->getStatusAfterAction('next');
+        $this->assertEquals(new Exception, $status);
     }
 
     public function testGetAvailableActions()
