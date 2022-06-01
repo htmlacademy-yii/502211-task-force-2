@@ -2,7 +2,7 @@
 
 namespace Exceptions;
 
-class Exception
+class ActionException
 {
 
 }

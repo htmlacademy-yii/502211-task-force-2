@@ -2,7 +2,7 @@
 
 namespace TaskForce\Classes;
 
-use Exceptions\Exception;
+use Exceptions\ActionException;
 use TaskForce\Classes\Actions\ActionCancel;
 use TaskForce\Classes\Actions\ActionRespond;
 use TaskForce\Classes\Actions\ActionStart;
@@ -67,7 +67,7 @@ class Task
         ];
 
         if (!isset($availableStatusesArray[$action])) {
-            throw new Exception("Action не может иметь такое значение");
+            throw new ActionException("Action не может иметь такое значение");
         }
 
         return $availableStatusesArray[$action];
