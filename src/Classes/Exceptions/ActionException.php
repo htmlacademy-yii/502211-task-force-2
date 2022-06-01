@@ -2,7 +2,9 @@
 
 namespace TaskForce\Classes\Exceptions;
 
-class ActionException
+use Exception;
+
+class ActionException extends Exception
 {
 
 }
