@@ -4,8 +4,7 @@
   },
   "autoload": {
     "psr-4": {
-      "TaskForce\\": "src/",
-      "Exceptions\\": "src/classes/Exceptions"
+      "TaskForce\\": "src/"
     }
   }
 }

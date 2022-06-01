@@ -1,6 +1,6 @@
 <?php
 
-namespace Exceptions;
+namespace TaskForce\Classes\Exceptions;
 
 class ActionException
 {

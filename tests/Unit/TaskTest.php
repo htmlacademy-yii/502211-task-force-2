@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use Exceptions\ActionException;
+use TaskForce\Classes\Exceptions\ActionException;
 use PHPUnit\Framework\TestCase;
 use TaskForce\Classes\Actions\ActionCancel;
 use TaskForce\Classes\Actions\ActionDone;
@@ -13,13 +13,18 @@ use TaskForce\Classes\Task;
 
 class TaskTest extends TestCase
 {
-    public function testGetStatusAfterAction()
+    public function testActionException()
     {
         $customerId = 1;
 
-        // $task = new Task(Task::STATUS_NEW, $customerId);
-        // $status = $task->getStatusAfterAction('next');
         $this->expectExceptionMessage(ActionException::class);
+        $task = new Task(Task::STATUS_NEW, $customerId);
+        $task->getStatusAfterAction('next');
+    }
+
+    public function testGetStatusAfterAction()
+    {
+        $customerId = 1;
 
         $task = new Task(Task::STATUS_NEW, $customerId);
         $status = $task->getStatusAfterAction(Task::ACTION_CANCEL);

@@ -2,7 +2,7 @@
 
 namespace TaskForce\Classes;
 
-use Exceptions\ActionException;
+use TaskForce\Classes\Exceptions\ActionException;
 use TaskForce\Classes\Actions\ActionCancel;
 use TaskForce\Classes\Actions\ActionRespond;
 use TaskForce\Classes\Actions\ActionStart;
