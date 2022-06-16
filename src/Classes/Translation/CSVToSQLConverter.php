@@ -6,6 +6,7 @@ use SplFileObject;
 use TaskForce\Classes\Exceptions\FileFormatException;
 use TaskForce\Classes\Exceptions\SourceFileException;
 use TaskForce\Classes\Exceptions\RuntimeException;
+use TaskForce\Classes\Exceptions\CreateException;
 
 class CSVToSQLConverter
 {
@@ -44,19 +45,43 @@ class CSVToSQLConverter
             throw new SourceFileException("Не удалось открыть файл на чтение");
         }
 
-        $header_data = $this->getHeaderData();
+        // Удаляем символы переноса в конце строки
+        // Читаем при использовании функций rewind
+        // Пропускаем пустые строки с файле
+        // Читаем строки в формате CSV
+        $this->fileObject->setFlags(SplFileObject::DROP_NEW_LINE | SplFileObject::READ_AHEAD | SplFileObject::SKIP_EMPTY | SplFileObject::READ_CSV);
+
+        // Получаем название столбцов
+        $header_data = implode(', ', $this->getHeaderData());
 
         if ($header_data !== $this->columns) {
             throw new FileFormatException("Исходный файл не содержит необходимых столбцов");
         }
 
-        foreach ($this->getNextLine() as $line) {
-            $this->result[] = $line;
-        }
-    }
+        // Получаем остальные данные
+        $this->result = sprintf("\t(%s)",
+            implode(', ',
+                array_map(
+                    function ($item) {
+                        return "'{$item}'";
+                    },
+                    $this->fileObject->fgetcsv(',')
+                )
+            )
+        );
 
-    public function getData():array {
-        return $this->result;
+        // Возвращаеv последний компонент имени из указанного пути
+        $newFile = basename($this->filename, '.csv');
+
+        // Создали новый файл
+        try {
+            $this->fileObject = new SplFileObject("src/db/$newFile.sql", 'w');
+        } catch (RuntimeException $exception) {
+            throw new CreateException('Не удалось создать или записать в файл');
+        }
+
+        // Вписали результат в новый файл
+        $this->fileObject->fwrite("INSERT INTO $newFile ($header_data) VALUES $this->result;");
     }
 
     private function getHeaderData():?array {
@@ -64,16 +89,6 @@ class CSVToSQLConverter
         $data = $this->fileObject->fgetcsv();
 
         return $data;
-    }
-
-    private function getNextLine():?iterable {
-        $result = null;
-
-        while (!$this->fileObject->eof()) {
-            yield $this->fileObject->fgetcsv();
-        }
-
-        return $result;
     }
 
     private function validateColumns(array $columns):bool
