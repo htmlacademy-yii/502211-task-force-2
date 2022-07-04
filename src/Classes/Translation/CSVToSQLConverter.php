@@ -10,7 +10,7 @@ use TaskForce\Classes\Exceptions\CreateException;
 
 class CSVToSQLConverter
 {
-    private  $filename;
+    private  $file;
     private  $columns;
     private  $fileObject;
 
@@ -19,12 +19,13 @@ class CSVToSQLConverter
 
     /**
      * CSVToSQLConverter constructor.
-     * @param $filename
+     * @param $file
      * @param $columns
      */
-    public function __construct(string $filename, array $columns)
+    public function __construct(string $file, array $columns)
     {
-        $this->filename = $filename;
+        $this->file = $file;
+        $this->filename = basename($file, '.csv');  // возвращает последний компонент имени из указанного пути
         $this->columns = $columns;
     }
 
@@ -34,22 +35,24 @@ class CSVToSQLConverter
             throw new FileFormatException("Заданы неверные заголовки столбцов");
         }
 
-        if (!file_exists($this->filename)) {
-            throw new SourceFileException("Файл не существует");
+        if (!file_exists($this->file)) {
+            throw new SourceFileException("Файл $this->filename.csv не существует");
         }
 
         try {
-            $this->fileObject = new SplFileObject($this->filename);
+            $this->fileObject = new SplFileObject($this->file);
         }
         catch (RuntimeException $exception) {
             throw new SourceFileException("Не удалось открыть файл на чтение");
         }
 
-        // Удаляем символы переноса в конце строки
-        // Читаем при использовании функций rewind
-        // Пропускаем пустые строки с файле
-        // Читаем строки в формате CSV
-        $this->fileObject->setFlags(SplFileObject::DROP_NEW_LINE | SplFileObject::READ_AHEAD | SplFileObject::SKIP_EMPTY | SplFileObject::READ_CSV);
+        $this->fileObject->
+            setFlags(
+                SplFileObject::DROP_NEW_LINE |  // удаляет символы переноса в конце строки
+                SplFileObject::READ_AHEAD |     // читает при использовании функций rewind
+                SplFileObject::SKIP_EMPTY |     // пропускает пустые строки с файле
+                SplFileObject::READ_CSV         // читает строки в формате CSV
+            );
 
         // Получаем название столбцов
         $header_data = implode(', ', $this->getHeaderData());
@@ -70,18 +73,15 @@ class CSVToSQLConverter
             )
         );
 
-        // Возвращаеv последний компонент имени из указанного пути
-        $newFile = basename($this->filename, '.csv');
-
-        // Создали новый файл
+        // Создаем новый файл
         try {
-            $this->fileObject = new SplFileObject("src/db/$newFile.sql", 'w');
+            $this->fileObject = new SplFileObject("src/db/data/$this->filename.sql", 'w');
         } catch (RuntimeException $exception) {
             throw new CreateException('Не удалось создать или записать в файл');
         }
 
-        // Вписали результат в новый файл
-        $this->fileObject->fwrite("INSERT INTO $newFile ($header_data) VALUES $this->result;");
+        // Вписываем результат в новый файл
+        $this->fileObject->fwrite("INSERT INTO $this->filename ($header_data) VALUES $this->result;");
     }
 
     private function getHeaderData():?array {
