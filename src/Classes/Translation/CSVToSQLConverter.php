@@ -29,7 +29,7 @@ class CSVToSQLConverter
         $this->columns = $columns;
     }
 
-    public function import():void
+    public function import(): void
     {
         if (!$this->validateColumns($this->columns)) {
             throw new FileFormatException("Заданы неверные заголовки столбцов");
@@ -41,8 +41,7 @@ class CSVToSQLConverter
 
         try {
             $this->fileObject = new SplFileObject($this->file);
-        }
-        catch (RuntimeException $exception) {
+        } catch (RuntimeException $exception) {
             throw new SourceFileException("Не удалось открыть файл на чтение");
         }
 
@@ -55,23 +54,31 @@ class CSVToSQLConverter
             );
 
         // Получаем название столбцов
-        $header_data = implode(', ', $this->getHeaderData());
+        $header_data = $this->getHeaderData();
 
         if ($header_data !== $this->columns) {
+            var_dump($header_data);
+            var_dump($this->columns);
             throw new FileFormatException("Исходный файл не содержит необходимых столбцов");
         }
 
+        $header_data = implode(', ', $header_data);
+
         // Получаем остальные данные
-        $this->result = sprintf("\t(%s)",
-            implode(', ',
-                array_map(
-                    function ($item) {
-                        return "'{$item}'";
-                    },
-                    $this->fileObject->fgetcsv(',')
+        foreach ($this->getNextLine() as $line) {
+            $this->result[] = sprintf(
+                "\t(%s)",
+                implode(
+                    ', ',
+                    array_map(
+                        function ($item) {
+                            return "'{$item}'";
+                        },
+                        $this->fileObject->fgetcsv(',')
+                    )
                 )
-            )
-        );
+            );
+        }
 
         // Создаем новый файл
         try {
@@ -81,17 +88,28 @@ class CSVToSQLConverter
         }
 
         // Вписываем результат в новый файл
-        $this->fileObject->fwrite("INSERT INTO $this->filename ($header_data) VALUES $this->result;");
+        $this->fileObject->fwrite("INSERT INTO $this->filename ($header_data) VALUES " . implode(', ', $this->result) . ";");
     }
 
-    private function getHeaderData():?array {
-        $this->fileObject->rewind();
+    private function getHeaderData(): ?array
+    {
         $data = $this->fileObject->fgetcsv();
 
         return $data;
     }
 
-    private function validateColumns(array $columns):bool
+    public function getNextLine(): ?iterable
+    {
+        $result = null;
+
+        while (!$this->fileObject->eof()) {
+            yield $this->fileObject->fgetcsv();
+        }
+
+        return $result;
+    }
+
+    private function validateColumns(array $columns): bool
     {
         $result = true;
 
@@ -101,8 +119,7 @@ class CSVToSQLConverter
                     $result = false;
                 }
             }
-        }
-        else {
+        } else {
             $result = false;
         }
 
