@@ -66,18 +66,12 @@ class CSVToSQLConverter
 
         // Получаем остальные данные
         foreach ($this->getNextLine() as $line) {
-            $this->result[] = sprintf(
-                "\t(%s)",
-                implode(
-                    ', ',
-                    array_map(
-                        function ($item) {
-                            return "'{$item}'";
-                        },
-                        $this->fileObject->fgetcsv(',')
-                    )
-                )
-            );
+            if (gettype($line) === 'array') {
+                $this->result[] = sprintf(
+                    "\t(%s)",
+                    implode(', ', $line)
+                );
+            }
         }
 
         // Создаем новый файл
