@@ -57,19 +57,35 @@ class CSVToSQLConverter
         $header_data = $this->getHeaderData();
 
         if ($header_data !== $this->columns) {
-            var_dump($header_data);
-            var_dump($this->columns);
             throw new FileFormatException("Исходный файл не содержит необходимых столбцов");
         }
 
-        $header_data = implode(', ', $header_data);
+        $header_data = implode(', ',
+            array_map(
+                function ($item) {
+                    return "`{$item}`";
+                },
+                $header_data
+            )
+        );
 
         // Получаем остальные данные
         foreach ($this->getNextLine() as $line) {
             if (gettype($line) === 'array') {
                 $this->result[] = sprintf(
                     "\t(%s)",
-                    implode(', ', $line)
+                    implode(', ',
+                        array_map(
+                            function ($item) {
+                                if (is_numeric($item)) {
+                                    return "{$item}";
+                                }
+
+                                return "'{$item}'";
+                            },
+                            $line
+                        )
+                    )
                 );
             }
         }
