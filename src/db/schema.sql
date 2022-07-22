@@ -26,15 +26,14 @@ CREATE TABLE IF NOT EXISTS `users` (
     `password` VARCHAR(45) NOT NULL,
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `last_visit` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    `description` VARCHAR(255) DEFAULT NULL,
-    `birthday` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    `address` INT UNSIGNED NOT NULL,
+    `about` VARCHAR(255) DEFAULT NULL,
+    `birthday` TIMESTAMP DEFAULT CURRENT_TIMESTAMP DEFAULT NULL,
+    `address` VARCHAR(255) DEFAULT NULL,
     `phone` VARCHAR(15) DEFAULT NULL,
     `skype` VARCHAR(50) DEFAULT NULL,
     `role` TINYINT DEFAULT 1,
     `rate` INT DEFAULT NULL,
 
-    FOREIGN KEY (`address`) REFERENCES `cities` (`id`)
     PRIMARY KEY (`id`)
 );
 
@@ -44,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `users_categories` (
     `category_id` INT UNSIGNED NOT NULL,
 
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
+    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -61,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `favorites` (
 CREATE TABLE IF NOT EXISTS `tasks` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `executor_id` INT UNSIGNED NOT NULL,
-    `customer_id` INT UNSIGNED NOT NULL,
+    `customer_id` INT UNSIGNED DEFAULT NULL,
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `category_id` INT UNSIGNED NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
@@ -79,15 +78,26 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     PRIMARY KEY (`id`)
 );
 
+CREATE TABLE IF NOT EXISTS `tasks_categories` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `task_id` INT UNSIGNED NOT NULL,
+    `category_id` INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
+    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
+    PRIMARY KEY (`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `replies` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `executor_id` INT UNSIGNED NOT NULL,
+    `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `rate` INT DEFAULT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `task_id` INT UNSIGNED NOT NULL,
-    `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    `user_id` INT UNSIGNED NOT NULL,
 
-    FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
     FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -106,12 +116,12 @@ CREATE TABLE IF NOT EXISTS `opinions` (
 
 CREATE TABLE IF NOT EXISTS `reviews` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `executor_id` INT UNSIGNED NOT NULL,
-    `customer_id` INT UNSIGNED NOT NULL,
+    `author_id` INT UNSIGNED NOT NULL,
+    `recipient_id` INT UNSIGNED NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `rate` INT NOT NULL,
 
-    FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
-    FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`),
-    PRIMARY KEY (`id`, `executor_id`, `customer_id`)
+    FOREIGN KEY (`author_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`recipient_id`) REFERENCES `users` (`id`),
+    PRIMARY KEY (`id`, `author_id`, `recipient_id`)
 );
