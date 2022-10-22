@@ -37,16 +37,6 @@ CREATE TABLE IF NOT EXISTS `users` (
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `users_categories` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `user_id` INT UNSIGNED NOT NULL,
-    `category_id` INT UNSIGNED NOT NULL,
-
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
-    PRIMARY KEY (`id`)
-);
-
 CREATE TABLE IF NOT EXISTS `favorites` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `user_id` INT UNSIGNED NOT NULL,
@@ -64,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `category_id` INT UNSIGNED NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
-    `status` TINYINT DEFAULT 1,
+    `status` VARCHAR(15) NOT NULL DEFAULT 'new',
     `expire` TIMESTAMP NOT NULL,
     `name` VARCHAR(45) NOT NULL,
     `address` VARCHAR(255) DEFAULT NULL,
@@ -74,16 +64,6 @@ CREATE TABLE IF NOT EXISTS `tasks` (
 
     FOREIGN KEY (`executor_id`) REFERENCES `users` (`id`),
     FOREIGN KEY (`customer_id`) REFERENCES `users` (`id`),
-    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
-    PRIMARY KEY (`id`)
-);
-
-CREATE TABLE IF NOT EXISTS `tasks_categories` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `task_id` INT UNSIGNED NOT NULL,
-    `category_id` INT UNSIGNED NOT NULL,
-
-    FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
     FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
     PRIMARY KEY (`id`)
 );
