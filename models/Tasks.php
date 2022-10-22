@@ -13,7 +13,7 @@ use Yii;
  * @property string $dt_add
  * @property int $category_id
  * @property string|null $description
- * @property int|null $status
+ * @property string $status
  * @property string $expire
  * @property string $name
  * @property string|null $address
@@ -26,7 +26,6 @@ use Yii;
  * @property Users $executor
  * @property Opinions[] $opinions
  * @property Replies[] $replies
- * @property TasksCategories[] $tasksCategories
  */
 class Tasks extends \yii\db\ActiveRecord
 {
@@ -45,10 +44,11 @@ class Tasks extends \yii\db\ActiveRecord
     {
         return [
             [['executor_id', 'category_id', 'expire', 'name'], 'required'],
-            [['executor_id', 'customer_id', 'category_id', 'status', 'budget'], 'integer'],
+            [['executor_id', 'customer_id', 'category_id', 'budget'], 'integer'],
             [['dt_add', 'expire'], 'safe'],
             [['lat', 'long'], 'number'],
             [['description', 'address'], 'string', 'max' => 255],
+            [['status'], 'string', 'max' => 15],
             [['name'], 'string', 'max' => 45],
             [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['executor_id' => 'id']],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['customer_id' => 'id']],
@@ -128,13 +128,9 @@ class Tasks extends \yii\db\ActiveRecord
         return $this->hasMany(Replies::className(), ['task_id' => 'id']);
     }
 
-    /**
-     * Gets query for [[TasksCategories]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTasksCategories()
+    public function getTimePassed()
     {
-        return $this->hasMany(TasksCategories::className(), ['task_id' => 'id']);
+        $timePassed = strtotime('now') - strtotime($this->dt_add);
+        return \Yii::$app->formatter->asDuration($timePassed);
     }
 }
