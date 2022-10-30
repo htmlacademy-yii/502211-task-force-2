@@ -1,18 +1,23 @@
 <?php
 namespace app\controllers;
 
-use app\models\Tasks;
+use app\models\SearchTasks;
+use app\models\Categories;
 use yii\web\Controller;
 
 class TasksController extends Controller
 {
     public function actionIndex()
     {
-        $tasks = Tasks::find()
-            ->where(['status' => 'new'])
-            ->orderBy('id DESC')
-            ->all();
+        $modelSearch = new SearchTasks();
+        $dataProvider = $modelSearch->search($this->request->post());
 
-        return $this->render('index', ['tasks' => $tasks]);
+        $categories = Categories::find()->where([])->all();
+
+        return $this->render('index', [
+            'modelSearch' => $modelSearch,
+            'dataProvider' => $dataProvider,
+            'categories' => $categories
+        ]);
     }
 }
