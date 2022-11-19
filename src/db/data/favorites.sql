@@ -10,7 +10,7 @@ INSERT INTO favorites (`user_id`, `favorite_user_id`) VALUES
 (9, 8),
 (10, 1),
 (10, 2),
-(11, 13)
-(12, 14)
-(16, 17)
+(11, 13),
+(12, 14),
+(16, 17),
 (16, 19);

@@ -24,16 +24,26 @@ CREATE TABLE IF NOT EXISTS `users` (
     `name` VARCHAR(45) NOT NULL,
     `email` VARCHAR(45) NOT NULL,
     `password` VARCHAR(45) NOT NULL,
+    `avatar` VARCHAR(45) DEFAULT NULL,
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `last_visit` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `about` VARCHAR(255) DEFAULT NULL,
     `birthday` TIMESTAMP DEFAULT CURRENT_TIMESTAMP DEFAULT NULL,
     `address` VARCHAR(255) DEFAULT NULL,
     `phone` VARCHAR(15) DEFAULT NULL,
-    `skype` VARCHAR(50) DEFAULT NULL,
-    `role` TINYINT DEFAULT 1,
+    `telegram` VARCHAR(50) DEFAULT NULL,
     `rate` INT DEFAULT NULL,
 
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `users_categories` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` INT UNSIGNED NOT NULL,
+    `category_id` INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`),
     PRIMARY KEY (`id`)
 );
 
@@ -72,6 +82,7 @@ CREATE TABLE IF NOT EXISTS `replies` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `rate` INT DEFAULT NULL,
+    `price` INT DEFAULT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `task_id` INT UNSIGNED NOT NULL,
     `user_id` INT UNSIGNED NOT NULL,
@@ -98,10 +109,13 @@ CREATE TABLE IF NOT EXISTS `reviews` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `author_id` INT UNSIGNED NOT NULL,
     `recipient_id` INT UNSIGNED NOT NULL,
+    `task_id` INT UNSIGNED NOT NULL,
+    `dt_add` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `description` VARCHAR(255) DEFAULT NULL,
     `rate` INT NOT NULL,
 
     FOREIGN KEY (`author_id`) REFERENCES `users` (`id`),
     FOREIGN KEY (`recipient_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`),
     PRIMARY KEY (`id`, `author_id`, `recipient_id`)
 );
