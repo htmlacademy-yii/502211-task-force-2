@@ -15,6 +15,7 @@ use Yii;
  *
  * @property Users $author
  * @property Users $recipient
+ * @property Task $task
  */
 class Reviews extends \yii\db\ActiveRecord
 {
@@ -72,5 +73,22 @@ class Reviews extends \yii\db\ActiveRecord
     public function getRecipient()
     {
         return $this->hasOne(Users::className(), ['id' => 'recipient_id']);
+    }
+
+    /**
+     * Gets query for [[Task]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTask()
+    {
+        return $this->hasOne(Tasks::className(), ['id' => 'task_id']);
+    }
+
+    public function getTimePassed()
+    {
+        $timePassed = strtotime('now') - strtotime($this->dt_add);
+        $days = $timePassed / 60 / 60 / 24;
+        return \Yii::t('yii', '{delta, plural, =1{1 день} other{# дней}}', ['delta' => $days], Yii::$app->language);
     }
 }
