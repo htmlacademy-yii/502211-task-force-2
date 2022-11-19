@@ -11,6 +11,7 @@ use Yii;
  * @property string $name
  * @property string $email
  * @property string $password
+ * @property string $avatar
  * @property string $dt_add
  * @property string $last_visit
  * @property string|null $about
@@ -30,6 +31,9 @@ use Yii;
  * @property Tasks[] $tasks
  * @property Tasks[] $tasks0
  * @property UsersCategories[] $usersCategories
+ * @property Tasks[] $doneTasks
+ * @property Tasks[] $failedTasks
+ * @property Tasks[] $workingTasks
  */
 class Users extends \yii\db\ActiveRecord
 {
@@ -50,7 +54,7 @@ class Users extends \yii\db\ActiveRecord
             [['name', 'email', 'password'], 'required'],
             [['dt_add', 'last_visit', 'birthday'], 'safe'],
             [['role', 'rate'], 'integer'],
-            [['name', 'email', 'password'], 'string', 'max' => 45],
+            [['name', 'email', 'password', 'avatar'], 'string', 'max' => 45],
             [['about', 'address'], 'string', 'max' => 255],
             [['phone'], 'string', 'max' => 15],
             [['skype'], 'string', 'max' => 50],
@@ -67,6 +71,7 @@ class Users extends \yii\db\ActiveRecord
             'name' => 'Name',
             'email' => 'Email',
             'password' => 'Password',
+            'avatar' => 'Avatar',
             'dt_add' => 'Dt Add',
             'last_visit' => 'Last Visit',
             'about' => 'About',
@@ -166,6 +171,47 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getUsersCategories()
     {
-        return $this->hasMany(UsersCategories::className(), ['user_id' => 'id']);
+        return $this->hasMany(UsersCategories::class, ['user_id' => 'id']);
+    }
+
+    public function getDoneTasks()
+    {
+        return $this->hasMany(Tasks::class, ['executor_id' => 'id'])->andWhere(['status' => 'done']);
+    }
+
+    public function getFailedTasks()
+    {
+        return $this->hasMany(Tasks::class, ['executor_id' => 'id'])->andWhere(['status' => 'fail']);
+    }
+
+    public function getWorkingTasks()
+    {
+        return $this->hasMany(Tasks::class, ['executor_id' => 'id'])->andWhere(['status' => 'in_work']);
+    }
+
+    public function getRating()
+    {
+        static $rating = null;
+
+        if (is_null($rating) && count($this->replies) > 0) {
+            $ratings = [];
+            foreach ($this->replies as $reply) {
+                $ratings[] = $reply->rate;
+            }
+
+            $rating = array_sum($ratings) / count($ratings);
+        }
+        return $rating;
+    }
+
+    public function getAge($birthday)
+    {
+        $birthday_timestamp = strtotime($birthday);
+        $age = date('Y') - date('Y', $birthday_timestamp);
+        if (date('md', $birthday_timestamp) > date('md')) {
+            $age--;
+        }
+
+        return $age;
     }
 }

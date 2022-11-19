@@ -34,7 +34,7 @@ class Replies extends \yii\db\ActiveRecord
     {
         return [
             [['dt_add'], 'safe'],
-            [['rate', 'task_id', 'user_id'], 'integer'],
+            [['rate', 'price', 'task_id', 'user_id'], 'integer'],
             [['task_id', 'user_id'], 'required'],
             [['description'], 'string', 'max' => 255],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::className(), 'targetAttribute' => ['task_id' => 'id']],
@@ -51,6 +51,7 @@ class Replies extends \yii\db\ActiveRecord
             'id' => 'ID',
             'dt_add' => 'Dt Add',
             'rate' => 'Rate',
+            'price' => 'Price',
             'description' => 'Description',
             'task_id' => 'Task ID',
             'user_id' => 'User ID',
@@ -75,5 +76,12 @@ class Replies extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(Users::className(), ['id' => 'user_id']);
+    }
+
+    public function getTimePassed()
+    {
+        $timePassed = strtotime('now') - strtotime($this->dt_add);
+        $days = $timePassed / 60 / 60 / 24;
+        return \Yii::t('yii', '{delta, plural, =1{1 день} other{# дней}}', ['delta' => $days], Yii::$app->language);
     }
 }
