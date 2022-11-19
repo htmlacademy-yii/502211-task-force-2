@@ -3,7 +3,9 @@ namespace app\controllers;
 
 use app\models\SearchTasks;
 use app\models\Categories;
+use app\models\Tasks;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class TasksController extends Controller
 {
@@ -19,5 +21,16 @@ class TasksController extends Controller
             'dataProvider' => $dataProvider,
             'categories' => $categories
         ]);
+    }
+
+    public function actionView($id)
+    {
+        $task = Tasks::findOne($id);
+
+        if (!$task) {
+            throw new NotFoundHttpException("Нет такого задания!");
+        }
+
+        return $this->render('view-task', ['task' => $task]);
     }
 }

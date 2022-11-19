@@ -131,6 +131,7 @@ class Tasks extends \yii\db\ActiveRecord
     public function getTimePassed()
     {
         $timePassed = strtotime('now') - strtotime($this->dt_add);
-        return \Yii::$app->formatter->asDuration($timePassed);
+        $days = $timePassed / 60 / 60 / 24;
+        return \Yii::t('yii', '{delta, plural, =1{1 день} other{# дней}}', ['delta' => $days], Yii::$app->language);
     }
 }

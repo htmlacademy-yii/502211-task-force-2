@@ -6,6 +6,7 @@
 
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 ?>
 
 <main class="main-content container">
@@ -15,7 +16,7 @@ use yii\helpers\Html;
         <?php foreach ($dataProvider->models as $task) : ?>
             <div class="task-card">
                 <div class="header-task">
-                    <a href="#" class="link link--block link--big"><?php echo $task->name; ?></a>
+                    <a href="<?php echo Url::to(['tasks/view', 'id' => $task->id]);?>" class="link link--block link--big"><?php echo $task->name; ?></a>
                     <p class="price price--task"><?php echo $task->budget; ?></p>
                 </div>
                 <p class="info-text"><span class="current-time"><?php echo $task->getTimePassed(); ?> </span>назад</p>
@@ -23,7 +24,7 @@ use yii\helpers\Html;
                 <div class="footer-task">
                     <p class="info-text town-text"><?php echo $task->address; ?></p>
                     <p class="info-text category-text"><?php echo $task->category->name; ?></p>
-                    <a href="#" class="button button--black">Смотреть Задание</a>
+                    <a href="<?php echo Url::to(['tasks/view', 'id' => $task->id]);?>" class="button button--black">Смотреть Задание</a>
                 </div>
             </div>
         <?php endforeach; ?>

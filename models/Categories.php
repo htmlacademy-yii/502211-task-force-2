@@ -12,7 +12,6 @@ use Yii;
  * @property string $icon
  *
  * @property Tasks[] $tasks
- * @property TasksCategories[] $tasksCategories
  * @property UsersCategories[] $usersCategories
  */
 class Categories extends \yii\db\ActiveRecord
@@ -56,16 +55,6 @@ class Categories extends \yii\db\ActiveRecord
     public function getTasks()
     {
         return $this->hasMany(Tasks::className(), ['category_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[TasksCategories]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTasksCategories()
-    {
-        return $this->hasMany(TasksCategories::className(), ['category_id' => 'id']);
     }
 
     /**
